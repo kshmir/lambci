@@ -19,6 +19,7 @@ function SlackClient(token, options, build) {
   this.iconUrl = options.iconUrl
   this.asUser = options.asUser
   this.showStackName = options.showStackName
+  this.onlyOnFail = options.onlyOnFail
   this.lastTs = null // Most recent timestamp
 
   this.repo = build.repo
@@ -35,7 +36,9 @@ function SlackClient(token, options, build) {
       fallback: `Started: ${build.repo} #${build.buildNum}`,
       title: `Build #${build.buildNum} started...`,
     }
-    this.statusQueue.push(status, log.logIfErr)
+    if (!this.onlyOnFail) {
+      this.statusQueue.push(status, log.logIfErr)
+    }
   })
 
   build.statusEmitter.finishTasks.push((build, cb) => {
@@ -50,7 +53,7 @@ function SlackClient(token, options, build) {
       status.fallback = `Failed: ${build.repo} #${build.buildNum} (${elapsedTxt})`
       status.title = `Build #${build.buildNum} failed (${elapsedTxt})`
       status.text = '```' + txt.replace(/```/g, "'''") + '```' // TODO: not sure best way to escape ```
-    } else {
+    } else if (!this.onlyOnFail) {
       status.color = 'good'
       status.fallback = `Success: ${build.repo} #${build.buildNum} (${elapsedTxt})`
       status.title = `Build #${build.buildNum} successful (${elapsedTxt})`
