@@ -115,7 +115,7 @@ function patchUncaughtHandlers(build, cb) {
 function buildDone(build, cb) {
 
   // Don't update statuses if we're doing a docker build and we launched successfully
-  if (!build.error && build.config.docker) return cb()
+  if (!build.error && build.config.docker) return process.exit(0);
 
   log.info(build.error ? `Build #${build.buildNum} failed: ${build.error.message}` :
     `Build #${build.buildNum} successful!`)
