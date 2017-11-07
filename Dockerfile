@@ -1,4 +1,4 @@
-FROM lambci/lambda
+FROM lambci/lambda:nodejs6.10
 
 WORKDIR /tmp/lambci/build
 
@@ -18,13 +18,13 @@ ADD . /var/task
 
 USER root
 
-RUN chown -R slicer:497 /var/task && chown -R sbx_user1051:495 /tmp
+# RUN chown -R slicer:497 /var/task && chown -R sbx_user1051:495 /tmp
 
-USER sbx_user1051
+# USER sbx_user1051
 
 RUN mkdir -p $HOME && \
   cp -r /var/task/home/. $HOME && \
   tar -C $HOME -xf /var/task/vendor/git-2.4.3.tar
 
-ENTRYPOINT []
-CMD bash
+ENTRYPOINT ["/var/lang/bin/node", "--max-old-space-size=1228", "--max-semi-space-size=77", "--max-executable-size=154", "--expose-gc", \
+   "/var/runtime/node_modules/awslambda/index.js"]
